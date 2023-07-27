@@ -1,4 +1,7 @@
-*.proto
-proto/
-*.temp
 obj.txt
+proto/
+*.proto
+*.txt
+*.temp
+!examples/*
+multi-lang-code-gen

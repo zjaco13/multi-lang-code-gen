@@ -93,7 +93,7 @@ func main() {
 	checkAndWrite(clusterProvidersF, clusterProviders)
 	checkAndWrite(teamF, teams)
 
-	rpcsRead, err := os.OpenFile(*rpcFileStr, os.O_RDONLY, 0644)
+	rpcsRead, err := os.OpenFile(*rpcFileStr, os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

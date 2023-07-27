@@ -1,0 +1,18 @@
+
+message ApplicationTeam {
+	string temp = 1;
+}
+
+message AddApplicationTeamRequest {
+	string cluster_name = 1;
+	ApplicationTeam applicationteam = 2;
+}
+
+message PlatformTeam {
+	string temp = 1;
+}
+
+message AddPlatformTeamRequest {
+	string cluster_name = 1;
+	PlatformTeam platformteam = 2;
+}

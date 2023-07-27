@@ -1,0 +1,9 @@
+
+message VpcProvider {
+	string temp = 1;
+}
+
+message AddVpcProviderRequest {
+	string cluster_name = 1;
+	VpcProvider vpcprovider = 2;
+}
