@@ -1,3 +1,5 @@
+syntax="proto3";
+package codegen;
 
 message VpcProvider {
 	string temp = 1;

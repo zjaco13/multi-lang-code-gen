@@ -1,3 +1,5 @@
+syntax="proto3";
+package codegen;
 
 message AckAddOn {
 	string temp = 1;
