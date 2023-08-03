@@ -31,3 +31,8 @@ go run main.go
 
 Running this program will generate a new rpc file at the passed in rpcfile.temp or cluster.proto.temp as default.  You must then overwrite the original file with an external command.
 
+Example overwrite command:
+```bash
+mv cluster.proto.temp cluster.proto
+```
+
