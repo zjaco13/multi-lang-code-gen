@@ -97,10 +97,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = os.Truncate(*rpcFileStr+".temp", 0)
-	if err != nil {
-		log.Fatal(err)
+
+	if _, err := os.Stat(*rpcFileStr + ".temp"); err == nil {
+		err = os.Truncate(*rpcFileStr+".temp", 0)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
 	rpcsWrite, err := os.OpenFile(*rpcFileStr+".temp", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
