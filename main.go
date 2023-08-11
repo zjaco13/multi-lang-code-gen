@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -20,6 +19,7 @@ const (
 )
 
 var (
+	dirFileStr    = flag.String("dir", ".", "directory to look for files")
 	objectFileStr = flag.String("obj", "obj.txt", "path to object text file")
 	addonFileStr  = flag.String("addon", "addons.proto", "path to addon proto file")
 	clPFileStr    = flag.String("clp", "cluster_providers.proto", "path to cluster provider proto file")
@@ -30,7 +30,10 @@ var (
 
 func main() {
 	flag.Parse()
-	file, err := os.Open(*objectFileStr)
+	if (*dirFileStr)[len(*dirFileStr)-1] != '/' {
+		*dirFileStr = *dirFileStr + "/"
+	}
+	file, err := os.Open(*dirFileStr + *objectFileStr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,30 +43,16 @@ func main() {
 	teams := make([]string, 0, 5)
 	resourceProviders := make([]string, 0, 5)
 	addons := make([]string, 0, 10)
-	// arr := ""
+
 	for scanner.Scan() {
 		line := scanner.Text()
-		//if line == ADDONS_STR || line == CLUSTER_PROVIDERS_STR || line == RESOURCE_PROVIDERS_STR || line == TEAM_STR {
-		//	arr = line
-		//	continue
-		//}
-
-		// if arr == ADDONS_STR {
-		// 	addons = append(addons, line)
-		// } else if arr == CLUSTER_PROVIDERS_STR {
-		// 	clusterProviders = append(clusterProviders, line)
-		// } else if arr == RESOURCE_PROVIDERS_STR {
-		// 	resourceProviders = append(resourceProviders, line)
-		// } else if arr == TEAM_STR {
-		// 	teams = append(teams, line)
-		// }
-		if strings.Contains(line, "AddOn") {
+		if strings.Contains(strings.ToLower(line), "addon") {
 			addons = append(addons, line)
-		} else if strings.Contains(line, "ClusterProvider") {
+		} else if strings.Contains(strings.ToLower(line), "clusterprovider") {
 			clusterProviders = append(clusterProviders, line)
-		} else if strings.Contains(line, "Provider") {
+		} else if strings.Contains(strings.ToLower(line), "provider") {
 			resourceProviders = append(resourceProviders, line)
-		} else if strings.Contains(line, "Team") {
+		} else if strings.Contains(strings.ToLower(line), "team") {
 			teams = append(teams, line)
 		}
 
@@ -72,19 +61,19 @@ func main() {
 		log.Fatal(err)
 	}
 	file.Close()
-	addonF, err := os.OpenFile(*addonFileStr, os.O_APPEND|os.O_RDWR, 0644)
+	addonF, err := os.OpenFile(*dirFileStr+*addonFileStr, os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	clusterProvidersF, err := os.OpenFile(*clPFileStr, os.O_APPEND|os.O_RDWR, 0644)
+	clusterProvidersF, err := os.OpenFile(*dirFileStr+*clPFileStr, os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resourceProvidersF, err := os.OpenFile(*rPFileStr, os.O_APPEND|os.O_RDWR, 0644)
+	resourceProvidersF, err := os.OpenFile(*dirFileStr+*rPFileStr, os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	teamF, err := os.OpenFile(*teamFileStr, os.O_APPEND|os.O_RDWR, 0644)
+	teamF, err := os.OpenFile(*dirFileStr+*teamFileStr, os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,19 +82,19 @@ func main() {
 	checkAndWrite(clusterProvidersF, clusterProviders)
 	checkAndWrite(teamF, teams)
 
-	rpcsRead, err := os.OpenFile(*rpcFileStr, os.O_RDWR, 0644)
+	rpcsRead, err := os.OpenFile(*dirFileStr+*rpcFileStr, os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if _, err := os.Stat(*rpcFileStr + ".temp"); err == nil {
-		err = os.Truncate(*rpcFileStr+".temp", 0)
+	if _, err := os.Stat(*dirFileStr + *rpcFileStr + ".temp"); err == nil {
+		err = os.Truncate(*dirFileStr+*rpcFileStr+".temp", 0)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	rpcsWrite, err := os.OpenFile(*rpcFileStr+".temp", os.O_RDWR|os.O_CREATE, 0644)
+	rpcsWrite, err := os.OpenFile(*dirFileStr+*rpcFileStr+".temp", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,7 +103,7 @@ func main() {
 }
 
 func checkAndWrite(fileToWrite *os.File, objects []string) error {
-	fileB, err := ioutil.ReadAll(fileToWrite)
+	fileB, err := os.ReadFile(fileToWrite.Name())
 	if err != nil {
 		return err
 	}
@@ -158,7 +147,7 @@ func writeAddRequest(file os.File, object string) error {
 func writeRPCs(fileToRead *os.File, fileToWrite *os.File, objects []string) (string, error) {
 	defer fileToRead.Close()
 	defer fileToWrite.Close()
-	fileB, err := ioutil.ReadAll(fileToWrite)
+	fileB, err := os.ReadFile(fileToWrite.Name())
 	if err != nil {
 		return "", err
 	}

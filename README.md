@@ -16,6 +16,8 @@ go run main.go
 
 ### Optional Flags
 ```bash
+-dir        specify directory to search for files in.  Deafults to '.'
+
 -obj        specify text file containing objects to generate.  Defaults to obj.txt
 
 -addon      specify proto file to write new addons to, must already exist.  Defaults to addons.proto
